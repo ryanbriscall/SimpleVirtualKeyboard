@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Virtual Keyboard Demo</title>
+
+    <style>
+    /* Typography */
+    :root {
+        font-size: 16px;
+    }
+    @media (min-width: 320px) and (max-width: 1200px) {
+        :root {
+            font-size: calc(16px + (28 - 16) * ((100vw - 320px) / (1200 - 320)));
+        }
+    }
+    @media (min-width: 1200px) {
+        :root {
+            font-size: 28px;
+        }
+    }
+    html {
+        font-family: sans-serif;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+    }
+    body {
+        line-height: 1.4;
+        font-family: Consolas, Terminal, Sans-serif;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        margin: 0.5em;
+    }
+
+    /* More */
+    button, input { font-family: inherit; font-size: inherit; }
+
+    /* Other */
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    /* Access Panel */
+    #access-panel-form {
+        margin: 0 auto;
+        width: 96vw;
+        text-align: center;
+        position: absolute;
+        top: 0.5em;
+    }
+
+    #access-panel {
+        margin: 0 auto;
+        width: 96vw;
+        text-align: center;
+        position: absolute;
+        bottom: 0.5em;
+    }
+    #access-panel-form button,
+    #access-panel-form input {
+        padding: 0.5em 1em;
+        border-radius: 0.2em;
+        text-align: center;
+    }
+
+    .btn-key {
+        margin: 1vw;
+        width: 14vw;
+        height: 14vw;
+        max-width: 100px;
+        max-height: 100px;
+        padding: 0;
+    }
+    [data-group] { display: none; }
+    [data-group].active { display: block; }
+
+    </style>
+</head>
+<body>
+
+<script>
+var categories = [
+    {
+        'group': 'a-z',
+        'keys': [
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+        ]
+    },
+    {
+        'group': 'A-Z',
+        'keys': [
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+        ]
+    },
+    {
+        'group': '0-9',
+        'keys': [
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '+', '='
+        ]
+    },
+    {
+        'group': '!$%',
+        'keys': [
+            '~', '!', '@', '#', '$', '%', '^', '&', '*', ';', ':', ',', '.', '?'
+        ]
+    },
+    {
+        'group': '({[',
+        'keys': [
+            '(', ')', '{', '}', '[', ']', '<', '>'
+        ]
+    },
+];
+
+document.body.innerHTML +=
+    '<form id="access-panel-form" method="post" action="?">' +
+    '<div><input type="password" id="access-panel-input" name="password"></div>' +
+    '<div><button type="submit">Continue</button></div>' +
+    '</form>';
+
+document.body.innerHTML += '<div id="access-panel"></div>';
+var panelEl = document.getElementById('access-panel');
+
+categories.forEach(function(category, i) {
+    var group = category.group;
+    var keys = category.keys;
+    panelEl.innerHTML += '<div data-group="'+group+'"></div>';
+    var groupEl = panelEl.querySelector('[data-group="'+group+'"]');
+    if (i === 0) groupEl.classList.add('active');
+    keys.forEach(function(key, k) {
+        groupEl.innerHTML += '<button data-key="'+key+'" class="btn-key">'+key+'</button>';
+    });
+});
+
+panelEl.innerHTML += '<hr>';
+panelEl.innerHTML += '<div id="access-panel-switcher"></div>';
+var switcherEl = document.getElementById('access-panel-switcher');
+
+categories.forEach(function(category, i) {
+    var group = category.group;
+    switcherEl.innerHTML += '<button data-switch="'+group+'" class="btn-key">'+group+'</button>';
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    categories.forEach(function(category, i) {
+        var group = category.group;
+        var keys = category.keys;
+        var groupEl = panelEl.querySelector('[data-group="'+group+'"]');
+        keys.forEach(function(key, k) {
+            var keyEl = groupEl.querySelector('[data-key="'+key+'"]');
+            keyEl.addEventListener('click', function(e) {
+                document.getElementById('access-panel-input').value += key;
+            });
+        });
+
+        switchEl = switcherEl.querySelector('[data-switch="'+group+'"]');
+        switchEl.addEventListener('click', function(e) {
+            var grp = this.getAttribute('data-switch');
+            Array.prototype.forEach.call(document.querySelectorAll('[data-group]'), function(grpEl, g) {
+                grpEl.classList.remove('active');
+            });
+            document.querySelector('[data-group="'+grp+'"]').classList.add('active');
+        });
+    });
+});
+</script>
+
+</body>
+</html>
